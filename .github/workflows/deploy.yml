@@ -1,15 +1,14 @@
-name: Deploy to Production
+name: Deploy to cPanel Hosting
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
-
+    name: Run Tests
+    
     steps:
     - uses: actions/checkout@v4
 
@@ -41,3 +40,91 @@ jobs:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: php artisan test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    name: Deploy to cPanel
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, mbstring, pdo
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install PHP Dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+    
+    - name: Install NPM Dependencies
+      run: npm ci
+    
+    - name: Build Assets
+      run: npm run build
+    
+    - name: Create deployment package
+      run: |
+        # Create deployment directory
+        mkdir -p island-tours-deploy
+        
+        # Copy application files
+        cp -r app island-tours-deploy/
+        cp -r bootstrap island-tours-deploy/
+        cp -r config island-tours-deploy/
+        cp -r database island-tours-deploy/
+        cp -r public island-tours-deploy/
+        cp -r resources island-tours-deploy/
+        cp -r routes island-tours-deploy/
+        cp -r storage island-tours-deploy/
+        cp -r vendor island-tours-deploy/
+        
+        # Copy essential files
+        cp artisan island-tours-deploy/
+        cp composer.json island-tours-deploy/
+        cp composer.lock island-tours-deploy/
+        
+        # Create production .env template
+        echo "# Copy this to .env and configure for production" > island-tours-deploy/.env.example
+        echo "APP_NAME='Island Tours'" >> island-tours-deploy/.env.example
+        echo "APP_ENV=production" >> island-tours-deploy/.env.example
+        echo "APP_KEY=" >> island-tours-deploy/.env.example
+        echo "APP_DEBUG=false" >> island-tours-deploy/.env.example
+        echo "APP_URL=https://your-domain.com" >> island-tours-deploy/.env.example
+        echo "" >> island-tours-deploy/.env.example
+        echo "DB_CONNECTION=mysql" >> island-tours-deploy/.env.example
+        echo "DB_HOST=127.0.0.1" >> island-tours-deploy/.env.example
+        echo "DB_PORT=3306" >> island-tours-deploy/.env.example
+        echo "DB_DATABASE=your_database" >> island-tours-deploy/.env.example
+        echo "DB_USERNAME=your_username" >> island-tours-deploy/.env.example
+        echo "DB_PASSWORD=your_password" >> island-tours-deploy/.env.example
+        
+        # Set proper permissions
+        chmod -R 755 island-tours-deploy/
+        chmod -R 775 island-tours-deploy/storage/
+        chmod -R 775 island-tours-deploy/bootstrap/cache/
+    
+    - name: Deploy to cPanel via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: './island-tours-deploy/'
+        server-dir: ${{ secrets.FTP_PATH || '/public_html/' }}
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/tests/**
+          **/.env.example
+          **/README.md
+          **/*.log
