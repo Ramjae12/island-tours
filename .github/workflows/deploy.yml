@@ -61,7 +61,7 @@ jobs:
         chmod -R 755 storage/
         chmod -R 755 bootstrap/cache/
     
-    - name: Deploy to cPanel via FTP (Optimized)
+    - name: Deploy to cPanel via FTP (Passive Mode)
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_HOST }}
@@ -69,6 +69,10 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: './island-tours-deploy/'
         server-dir: ${{ secrets.FTP_PATH }}
+        protocol: ftp
+        port: 21
+        security: loose
+        timeout: 60000
         exclude: |
           **/.git*
           **/.git*/**
