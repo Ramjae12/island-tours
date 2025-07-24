@@ -35,6 +35,12 @@ jobs:
         mkdir -p database
         touch database/database.sqlite
 
+    - name: Run Fresh Migrations
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: php artisan migrate:fresh --force
+
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       env:
         DB_CONNECTION: sqlite
