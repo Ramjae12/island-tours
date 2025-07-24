@@ -61,26 +61,12 @@ jobs:
         chmod -R 755 storage/
         chmod -R 755 bootstrap/cache/
     
-    - name: Deploy to cPanel via FTP (Passive Mode)
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+    - name: Deploy to cPanel via FTP (Alternative Method)
+      uses: sebastianpopp/ftp-action@releases/v2
       with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USERNAME }}
+        host: ${{ secrets.FTP_HOST }}
+        user: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: './island-tours-deploy/'
-        server-dir: ${{ secrets.FTP_PATH }}
-        protocol: ftp
-        port: 21
-        security: loose
-        timeout: 60000
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/tests/**
-          **/*.log
-          **/*.zip
-          **/storage/logs/**
-          **/storage/framework/cache/**
-          **/storage/framework/sessions/**
-          **/storage/framework/views/**
+        localDir: './island-tours-deploy/'
+        remoteDir: ${{ secrets.FTP_PATH }}
+        options: '--transfer-all --delete --verbose'

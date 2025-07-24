@@ -1,0 +1,9 @@
+# Manual Deployment Instructions 
+ 
+1. Upload all files to your cPanel public_html directory 
+2. Copy .env.example to .env and configure database settings 
+3. Generate application key: php artisan key:generate 
+4. Run migrations: php artisan migrate --force 
+5. Set storage permissions: chmod -R 775 storage/ 
+6. Set bootstrap/cache permissions: chmod -R 775 bootstrap/cache/ 
+7. Your site should be live at: https://stg-corregidorisland.tieza.online/ 
