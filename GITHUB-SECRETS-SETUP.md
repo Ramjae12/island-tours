@@ -7,11 +7,11 @@
 
 ### Step 2: Add These 4 Secrets
 
-| Secret Name | What It Is | Example Value |
-|------------|------------|---------------|
-| `FTP_HOST` | Your FTP server address | `ftp.yourdomain.com` |
-| `FTP_USERNAME` | Your FTP login username | `cpanelusername@yourdomain.com` |
-| `FTP_PASSWORD` | Your FTP login password | `your_cpanel_password` |
+| Secret Name | What It Is | YOUR EXACT VALUE |
+|------------|------------|------------------|
+| `FTP_HOST` | Your FTP server address | `103.131.95.116` |
+| `FTP_USERNAME` | Your FTP login username | `stgcorregidorisl` |
+| `FTP_PASSWORD` | Your FTP login password | `[Your cPanel password]` |
 | `FTP_PATH` | Where to deploy files | `/public_html/` |
 
 ### Step 3: How to Add Each Secret
@@ -56,13 +56,15 @@ If unsure, ask your hosting provider for:
 | GoDaddy | `/public_html/` |
 | SiteGround | `/public_html/` |
 
-## After Setup
+## After Setup - Your Site Will Be Live!
 
 Once secrets are added, every push to `main` branch will:
 1. ✅ Run tests
 2. ✅ Build production assets
 3. ✅ Deploy to your cPanel hosting
-4. ✅ Your site will be live!
+4. ✅ Your Island Tours app will be live at: https://stg-corregidorisland.tieza.online/
+
+## UPDATED: GitHub Secrets Added! 🎉
 
 ## Need Help?
 
